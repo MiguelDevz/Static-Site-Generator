@@ -50,24 +50,26 @@ class TestParentNode(unittest.TestCase):
         parent_node = ParentNode("div", [child_node])
         self.assertEqual(
             parent_node.to_html(),
-            "<div><span><b>grandchild</b></span></div>",
-        )
-
-    def test_to_html_with_parent(self):
-        child_node = ParentNode("span", [])
-        parent_node = ParentNode("div", [child_node])
-        with self.assertRaises(ValueError):
-            parent_node.to_html()
+            "<div><span><b>grandchild</b></span></div>")
 
     def test_to_html_multiple_children(self):
-        child_node1 = LeafNode("p", "This is a paragraph",)
+        child_node1 = LeafNode("p", "This is a paragraph")
         child_node2  = LeafNode("span", "This is a span")
         parent_node = ParentNode("div", [child_node1, child_node2])
-        self.assertEqual(parent_node.to_html(), "<div><p>This is a paragraph</p><span>This is a span</span></div>")
+        self.assertEqual(parent_node.to_html(),"<div><p>This is a paragraph</p><span>This is a span</span></div>")
 
-    def test_to_html_no_children(self):
-        parent_node = ParentNode("div", [])
-        self.assertEqual(parent_node.to_html(), "ValueError: ParentNode is missing children")
+    def test_to_html_none_children(self):
+        parent_node = ParentNode("div", None)
+        with self.assertRaises(ValueError) as context:
+            parent_node.to_html()
+        self.assertEqual(str(context.exception), "ParentNode is missing children")
+
+    def test_to_html_no_tag(self):
+        child_node = LeafNode("p", "this is a paragraph")
+        parent_node = ParentNode(None, [child_node])
+        with self.assertRaises(ValueError) as context:
+            parent_node.to_html()
+        self.assertEqual(str(context.exception), "ParentNode must have a tag")
 
 if __name__ == "__main__":
     unittest.main()
