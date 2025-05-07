@@ -1,6 +1,6 @@
 import unittest
 from textnode import TextNode, TextType
-from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
+from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
 
 class TestInlineMarkdown(unittest.TestCase):
 
@@ -74,3 +74,28 @@ class TestInlineMarkdown(unittest.TestCase):
             TextNode("This is text with an ", TextType.TEXT),
             TextNode("link", TextType.LINK, "https://www.example.com")
         ], new_nodes)
+
+    #Test text_to_textnodes
+    def test_nested_text_to_textnodes(self):
+        textnodes = text_to_textnodes("This is **text** with an _italic_ word and a `code block` and an ![image](./images/img) and a [link](https://example.com)")
+        self.assertListEqual([
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.BOLD),
+            TextNode(" with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode("image", TextType.IMAGE, "./images/img"),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://example.com"),
+
+        ], textnodes)
+
+    def test_italic_text_to_testnodes(self):
+        textnodes = text_to_textnodes("This is text with an _italic_ word")
+        self.assertListEqual([
+            TextNode("This is text with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word", TextType.TEXT)
+        ], textnodes)
