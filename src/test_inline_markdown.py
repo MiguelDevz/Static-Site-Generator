@@ -99,3 +99,7 @@ class TestInlineMarkdown(unittest.TestCase):
             TextNode("italic", TextType.ITALIC),
             TextNode(" word", TextType.TEXT)
         ], textnodes)
+
+
+if __name__ == "__main__":
+    unittest.main()
