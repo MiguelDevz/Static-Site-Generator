@@ -30,7 +30,7 @@ def split_nodes_image(old_nodes):
             node_list.append(node)
             continue
 
-        img_md = extract_markdown_images    (node.text)
+        img_md = extract_markdown_images(node.text)
         if img_md == []:
             node_list.append(node)
             continue
@@ -67,15 +67,15 @@ def split_nodes_link(old_nodes):
             node_list.append(node)
             continue
 
-        link_md = extract_markdown_links    (node.text)
+        link_md = extract_markdown_links(node.text)
         if link_md == []:
             node_list.append(node)
             continue
 
         current_text = node.text
         for alt, url in link_md:
-            full_image_markdown = f"[{alt}]({url})"
-            parts = current_text.split(full_image_markdown, 1)
+            full_link_markdown = f"[{alt}]({url})"
+            parts = current_text.split(full_link_markdown, 1)
 
             #Text before link
             if parts[0]:

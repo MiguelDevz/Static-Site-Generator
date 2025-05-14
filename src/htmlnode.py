@@ -41,3 +41,6 @@ class ParentNode(HTMLNode):
             raise ValueError("ParentNode is missing children")
         children_html = "".join(child.to_html() for child in self.children)
         return f"<{self.tag}{self.props_to_html()}>{children_html}</{self.tag}>"
+    
+    def __repr__(self):
+        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
