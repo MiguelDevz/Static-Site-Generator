@@ -39,6 +39,7 @@ class ParentNode(HTMLNode):
             raise ValueError("ParentNode must have a tag")
         if self.children is None:
             raise ValueError("ParentNode is missing children")
+        #recurses through if node has a child then joins
         children_html = "".join(child.to_html() for child in self.children)
         return f"<{self.tag}{self.props_to_html()}>{children_html}</{self.tag}>"
     

@@ -1,7 +1,8 @@
 from enum import Enum
 import re
-from htmlnode import HTMLNode, LeafNode, ParentNode
-
+from htmlnode import LeafNode, ParentNode
+from textnode import TextNode, TextType, text_node_to_html_node
+from inline_markdown import text_to_textnodes
 
 class BlockType(Enum):
     PARAGRAPH = "paragraph"
@@ -40,25 +41,15 @@ def block_to_block_type(md_block):
     
 
 def text_to_children(text):
-    htmlnode_list = []
-    from inline_markdown import text_to_textnodes
-    from textnode import TextType
-    textnodes = text_to_textnodes(text)
-    for node in textnodes:
-        match(node.text_type):
-            case TextType.BOLD:
-                htmlnode_list.append(LeafNode("b", node.text))
-            case TextType.ITALIC:
-                htmlnode_list.append(LeafNode("i", node.text))
-            case TextType.CODE:
-                htmlnode_list.append(LeafNode("code", node.text))
-            case _:
-                htmlnode_list.append(LeafNode(None, node.text))
-    return htmlnode_list
+    text_nodes = text_to_textnodes(text)
+    children = []
+    for text_node in text_nodes:
+        html_node = text_node_to_html_node(text_node)
+        children.append(html_node)
+    return children
 
 
 def markdown_to_html_node(markdown):
-    from textnode import TextNode, TextType, text_node_to_html_node
     blocks = markdown_to_blocks(markdown)
     html_nodes = []
     for block in blocks:
@@ -70,8 +61,10 @@ def markdown_to_html_node(markdown):
                 if match:
                     level = match.group(1)
                     value = match.group(2)
+                    #Turns num of "#" str into int
                     tag = f"h{len(level)}"
                     html_nodes.append(ParentNode(tag=tag, children=text_to_children(value), props=None))
+
             case BlockType.CODE:
                 lines = block.splitlines()
                 if lines[0].strip() == "```":
@@ -83,12 +76,14 @@ def markdown_to_html_node(markdown):
                 if not text.endswith("\n"):
                     text += "\n"
                 html_nodes.append(ParentNode(tag="pre", children=[text_node_to_html_node(TextNode(text, TextType.CODE))], props=None))
+                
             case BlockType.QUOTE:
                 #Removes ">" then strips leading/trailing whitespces
                 lines = block.splitlines()
                 cleaned = [line.lstrip("> ").strip() for line in lines]
                 text = "\n".join(cleaned)
                 html_nodes.append(ParentNode(tag="blockquote", children=text_to_children(text), props=None))
+
             case BlockType.UNORDERED_LIST:
                 #a list of lines
                 lines = block.split("\n")
@@ -97,6 +92,7 @@ def markdown_to_html_node(markdown):
                     text = line[2:] # removes "- "
                     li_nodes.append(ParentNode(tag="li", children=text_to_children(text), props=None))
                 html_nodes.append(ParentNode(tag="ul", children=li_nodes, props=None))
+
             case BlockType.ORDERED_LIST:
                 #a list of lines
                 lines = block.split("\n")
@@ -106,9 +102,11 @@ def markdown_to_html_node(markdown):
                     text = re.sub(r"^\d+\. ", "", line)
                     li_nodes.append(ParentNode(tag="li", children=text_to_children(text), props=None))
                 html_nodes.append(ParentNode(tag="ol", children=li_nodes, props=None))
+
             case _:
                 paragraph_text = " ".join(block.splitlines())
                 html_nodes.append(ParentNode(tag="p", children=text_to_children(paragraph_text), props=None))
+                
     return ParentNode(tag="div", children=html_nodes, props=None)
             
 
