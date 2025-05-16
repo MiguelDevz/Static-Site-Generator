@@ -110,33 +110,3 @@ def markdown_to_html_node(markdown):
     return ParentNode(tag="div", children=html_nodes, props=None)
             
 
-
-
-md = markdown_to_blocks("""
-This is **bolded** paragraph
-
-This is another paragraph with _italic_ text and `code` here
-This is the same paragraph on a new line
-
-- This is a list
-- with items
-""")
-# print(md)
-
-md_type_p = block_to_block_type("This is some text for a markdown paragraph")
-md_type_ordered_list = block_to_block_type("1. apple 2. orange 3. mango")
-md_type_heading = block_to_block_type("### markdown 3 heading")
-# print(md_type_p)
-# print(md_type_ordered_list)
-# print(md_type_heading)
-
-print(markdown_to_html_node("""
-This is **bolded** paragraph
-
-This is another paragraph with _italic_ text and `code` here
-This is the same paragraph on a new line
-
-- This is a list
-- with items
-""").to_html())
-

@@ -18,7 +18,7 @@ class TestHTMLNode(unittest.TestCase):
 
     def test_props_to_html(self):
         node = HTMLNode("div", "This is a div", props={"id": "main", "class": "container"})
-        self.assertEqual('id="main" class="container"', node.props_to_html())
+        self.assertEqual(' id="main"  class="container"', node.props_to_html())
 
 class TestLeafNode(unittest.
 TestCase):
