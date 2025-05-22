@@ -10,7 +10,7 @@ def extract_title(markdown):
     raise Exception("No h1 header found")
 
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
     with open(from_path, "r") as f:
         md_file = f.read()
@@ -19,6 +19,10 @@ def generate_page(from_path, template_path, dest_path):
     html = markdown_to_html_node(md_file).to_html()
     title = extract_title(md_file)
     full_html_page = template_file.replace("{{ Title }}", title).replace("{{ Content }}", html)
+    if 'href="/' in full_html_page:
+        full_html_page = full_html_page.replace('href="/', f'href="{basepath}')
+    if 'src="/' in full_html_page:
+        full_html_page = full_html_page.replace('src="/', f'src="{basepath}')
     directory_to_create = os.path.dirname(dest_path)
     if directory_to_create:
         os.makedirs(directory_to_create, exist_ok=True)
@@ -26,7 +30,7 @@ def generate_page(from_path, template_path, dest_path):
         f.write(full_html_page)
 
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     content_path = Path(dir_path_content)
     template_path = Path(template_path)
     dest_path = Path(dest_dir_path)
@@ -37,10 +41,10 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
             destination = dest_path / relative_path.with_suffix(".html")
             destination.parent.mkdir(parents=True, exist_ok=True)
 
-            generate_page(str(file), str(template_path), str(destination))
+            generate_page(str(file), str(template_path), str(destination), str(basepath))
         elif file.is_dir():
             new_dest = dest_path / file.name
             new_dest.mkdir(parents=True, exist_ok=True)
-            generate_pages_recursive(str(file), str(template_path), str(new_dest))
+            generate_pages_recursive(str(file), str(template_path), str(new_dest), str(basepath))
         
         

@@ -1,5 +1,5 @@
-from textnode import TextNode, TextType
 import os
+import sys
 import shutil
 
 from copystatic import copy_files_recursively
@@ -7,20 +7,25 @@ from page_generator import generate_page, generate_pages_recursive
 
 
 dir_path_static = "./static"
-dir_path_public = "./public"
+dir_path_docs = "./docs"
+dir_path_content = "./content"
+template_path = "./template.html"
 
-content_index_md = "./content/index.md"
-template_html = "./template.html"
-public_index_html = "./public/index.html"
+if len(sys.argv) > 1:
+    basepath = sys.argv[1]
+else:
+    basepath = "/"
 
 def main():
-    print("Deleting public directory...")
-    if os.path.exists(dir_path_public):
-        shutil.rmtree(dir_path_public)
+    print("Deleting docs directory...")
+    if os.path.exists(dir_path_docs):
+        shutil.rmtree(dir_path_docs)
 
-    print("Copying static files to public directory...")
-    copy_files_recursively(dir_path_static, dir_path_public)
-    generate_pages_recursive("content", "template.html", "public")
+    print("Copying static files to docs directory...")
+    copy_files_recursively(dir_path_static, dir_path_docs)
+
+    print("Generating content...")
+    generate_pages_recursive(dir_path_content, template_path, dir_path_docs, basepath)
 
 if __name__ == "__main__":
     main()
